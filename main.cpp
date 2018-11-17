@@ -1,53 +1,55 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include <stdio.h>
 #include <iostream>
+#include <string>
+#include "filesss.h"
+
+using namespace filesss;
 
 
-using namespace std;
+int prompt() {
 
-// An unsigned char can store 1 Bytes (8bits) of data (0-255)
-typedef unsigned char BYTE;
-
-// Get the size of a file
-long getFileSize(FILE *file)
-{
-	long lCurPos, lEndPos;
-	lCurPos = ftell(file);
-	fseek(file, 0, 2);
-	lEndPos = ftell(file);
-	fseek(file, lCurPos, 0);
-	return lEndPos;
-}
-
-int main()
-{
-	const char *filePath = ".\\test.jpg";
-	BYTE *fileBuf;			// Pointer to our buffered data
-	FILE *file = NULL;		// File pointer
-
-							// Open the file in binary mode using the "rb" format string
-							// This also checks if the file exists and/or can be opened for reading correctly
-	if ((file = fopen(filePath, "rb")) == NULL)
-		cout << "Could not open specified file" << endl;
-	else
-		cout << "File opened successfully" << endl;
-
-	// Get the size of the file in bytes
-	long fileSize = getFileSize(file);
-
-	// Allocate space in the buffer for the whole file
-	fileBuf = new BYTE[fileSize];
-
-	// Read the file in to the buffer
-	fread(fileBuf, fileSize, 1, file);
-
-	// Now that we have the entire file buffered, we can take a look at some binary infomation
-	// Lets take a look in hexadecimal
-	for (int i = 0; i < fileSize; i++)
-		printf("%X ", fileBuf[i]);
-
-	cin.get();
-	delete[]fileBuf;
-	fclose(file);   // Almost forgot this 
+	std::cout << "\n\nPress any key to continue...";
+	std::cin.get();
 	return 0;
-}
+};
+
+int main(int argc, char* argv[])
+{
+	if (argc == 1) {
+		std::cerr << "*** Missing JPEG File! ***\n";
+		std::cerr << "Usage: " << argv[0] << " <JPGFILE>";
+		prompt();
+		return 1;
+	}
+	else if (argc == 2) {
+		std::cerr << "*** Missing RAR File! ***\n";
+		std::cerr << "Usage: " << argv[0] << " " << argv[1] << " <RARFILE>";
+		prompt();
+		return 1;
+	}
+	else if (argc != 3) {
+		std::cerr << "*** Too many arguments ***\n";
+		std::cerr << "Usage: " << argv[0] << " " << argv[1] << " " << argv[3] << " <whywouldyoudothis?>";
+		prompt();
+		return 2;
+	};
+
+	fileIn jpgfile(argv[1]);
+	fileIn rarfile(argv[2]);
+
+	//jpgfile.visualizeData();
+	//rarfile.visualizeData();
+
+	std::string fname;
+	std::cout << "Enter file name, no extension: ";
+	std::cin >> fname;
+
+	fname = fname + ".jpg";
+
+	copyFileData(jpgfile, rarfile, fname);
+
+	std::cout << "Done.";
+
+	return 0;
+};

@@ -1,4 +1,1 @@
-﻿  filesss.cpp
-  main.cpp
-d:\desktop\filereader\main.cpp(42): error C3867: 'filesss::fileIn::getFileSize': non-standard syntax; use '&' to create a pointer to member
-  Generating Code...
+﻿  filereader.vcxproj -> D:\Desktop\filereader\Debug\filereader.exe

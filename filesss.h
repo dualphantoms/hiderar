@@ -21,6 +21,7 @@ namespace filesss {
 		~fileIn();
 	};
 
-	int copyFileData(fileIn jpg, fileIn rar, std::string fname);
+	void copyFileData(fileIn jpg, fileIn rar, std::string fname);
+	void prompt();
 };
 #endif

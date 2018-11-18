@@ -9,6 +9,7 @@
 typedef unsigned char BYTE;
 typedef unsigned long ulong;
 typedef unsigned int uint;
+typedef std::string string;
 
 namespace filesss {
 
@@ -16,17 +17,35 @@ namespace filesss {
 	
 		filePath = nullptr;
 		fileSize = 0;
+		badfile = true;
 
+	};
+
+	void fileIn::check(const char *checkthis) {
+			
+		std::string findext = checkthis;
+		
+		if (findext.size() <= 4) {
+		type = 'x';
+		}else{
+
+		findext = findext.substr(findext.length() - 4, 4);
+
+		if (findext == ".jpg") { type = 'j'; }
+		else if (findext == ".rar") { type = 'r'; }
+		else { type = 'x'; };
+		};
 	};
 
 	fileIn::fileIn(const char *fileInPath) {
 	
 		filePath = fileInPath;
+		check(filePath);
 		fileSize = calcFileSize();
 
 		if (fileSize == 0) {
-			
-		};
+			badfile = true;
+		}else { badfile = false; };
 
 	};
 
@@ -35,7 +54,7 @@ namespace filesss {
 		ulong length = 0;
 		std::ifstream is(filePath, std::fstream::in);
 		if (!is) {
-			std::cerr << "\n***Failed to open file " << filePath << " ***\n";
+			//std::cerr << "\n***Failed to open file <" << filePath << ">. Please check input. ***\n";
 			return 0;
 		};
 
@@ -57,7 +76,7 @@ namespace filesss {
 		return length;
 	}
 
-	void copyFileData(fileIn jpg, fileIn rar, std::string fname) {
+	void copyFileData(fileIn jpg, fileIn rar, string fname) {
 
 		uint Jsize = jpg.getFileSize();
 		uint Rsize = rar.getFileSize();
@@ -69,13 +88,13 @@ namespace filesss {
 
 		std::ifstream inJfile(jpg.getFilePath(), std::ios::in | std::ios_base::binary);
 		if (!inJfile) {
-			std::cerr << "\n***Failed to open file " << jpg.getFilePath() << " ***\n";
+			std::cerr << "\n***Failed to open jpg file <" << jpg.getFilePath() << ">. Please check input. ***\n";
 			return;
 		};
 
 		std::ifstream inRfile(rar.getFilePath(), std::ios::in | std::ios_base::binary);
 		if (!inRfile) {
-			std::cerr << "\n***Failed to open file " << rar.getFilePath() << " ***\n";
+			std::cerr << "\n***Failed to open rar file <" << rar.getFilePath() << ">. Please check input. ***\n";
 			return;
 		};
 		
@@ -87,10 +106,12 @@ namespace filesss {
 
 
 		std::ofstream outfile(fname, std::ios::out | std::ofstream::binary);
-		if (outfile) {
+		if (!outfile) {
 			char *cstr = &fname[0u];
-			std::cerr << "\n***Failed to open file " << cstr;
-			return;
+			std::cerr << "\n***Failed to open outfile file <" << cstr << ">. Please check input. ***\n";
+			std::cout << "\n\nPress any key to continue...";
+			std::cin.get();
+			exit(EXIT_FAILURE);
 		};
 
 		outfile.write((char*)&buffer[0], size);
@@ -117,11 +138,5 @@ namespace filesss {
 	fileIn::~fileIn(){
 		filePath = nullptr;
 		fileSize = 0;
-	};
-
-	void prompt() {
-		std::cout << "\n\nPress any key to continue...";
-		std::cin.get();
-		return;
 	};
 };

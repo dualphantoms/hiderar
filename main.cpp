@@ -16,13 +16,24 @@ std::string fileName() {
 	return fname;
 };
 
-
+void prompt() {
+	std::cout << "\n\nPress any key to continue...";
+	std::cin.get();
+	exit(EXIT_FAILURE);
+};
 
 int main(int argc, char* argv[])
 {
 	std::string fname;
+	fileIn jpgfile;
+	bool flagem = false;
 
-	if (argc == 1) {
+	//std::cout << "\nCommand Line : ";
+	//for (int i = 0; i < argc; i++) {
+	//	std::cout << argv[i] << ' ';
+	//}
+
+	if (argc == 1) {		
 		std::cerr << "*** Missing JPEG File! ***\n";
 		std::cerr << "Usage: " << argv[0] << " <JPGFILE>";
 		prompt();
@@ -33,9 +44,24 @@ int main(int argc, char* argv[])
 		prompt();
 	}
 	else if (argc == 3) {
-		fname = fileName();
+		//load'em
+		jpgfile = fileIn(argv[1]);
+		if (jpgfile.getFileSize() == 0 || jpgfile.type != 'j') {
+			std::cerr << "*** Missing JPEG File! ***\n";
+			std::cerr << "Usage: " << argv[0] << " <JPGFILE>";
+			prompt();
+		};
+
+		flagem = true;
 	}
 	else if (argc == 4) {
+		jpgfile = fileIn(argv[1]);
+		if (jpgfile.getFileSize() == 0 || jpgfile.type != 'j') {
+			std::cerr << "*** Missing JPEG File! ***\n";
+			std::cerr << "Usage: " << argv[0] << " <JPGFILE>";
+			prompt();
+		};
+
 		fname = argv[3];
 		std::size_t found = fname.find(".jpg");
 		if (found == std::string::npos) {
@@ -48,19 +74,28 @@ int main(int argc, char* argv[])
 		prompt();
 	};
 
-	//load'em
-	fileIn jpgfile(argv[1]);
-	if (jpgfile.getFileSize() == 0) {
-		prompt();
-		return 2;
-	};
-	fileIn rarfile(argv[2]);
 
-	//hide'em
-	copyFileData(jpgfile, rarfile, fname);
+	//load'em 2: electric rarfileloo
+	fileIn rarfile(argv[2]);
+	if (rarfile.getFileSize() == 0 || rarfile.type != 'r') {
+		std::cerr << "*** Missing RAR File! ***\n";
+		std::cerr << "Usage: " << argv[0] << " " << argv[1] << " <RARFILE>";
+		prompt();
+	};
+
+
 	
-	//tell'em
-	std::cout << "Done.";
+	//validate'em
+	if (jpgfile.badfile == false && rarfile.badfile == false) {
+		
+		if (flagem) { 
+			fname = fileName(); 
+		};
+
+		//hide'em
+		copyFileData(jpgfile, rarfile, fname);
+	};
+	
 
 	//leave'em
 	return 0;
